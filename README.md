@@ -39,29 +39,21 @@ CSV data imports
 
 personal-library/
 
-|
+ database/
 
-|- database/
+   schema.sql (full database structure)
 
-|  |-schema.sql (full database structure)
+   seeds.sql (sample seed data)
 
-|  |-seeds.sql (sample seed data)
+ csv/ (real data)
 
-|
+   ...
 
-|- csv/ (real data)
+ diagrams/ (ER diagrams and documentation)
 
-|  |- ...
+   er-diagram.png (to add)
 
-|
-
-|- diagrams/ (ER diagrams and documentation)
-
-|  |- er-diagram.png (to add)
-
-|
-
-|- README.md
+ README.md
 
 
 ## Data Model (Summary)
