@@ -69,7 +69,7 @@ personal-library/
 Main tables:
 
 
-authors
+- authors
 
 
 author_id (PK)
@@ -77,7 +77,7 @@ author_id (PK)
 name
 
 
-series
+- series
 
 
 series_id (PK)
@@ -85,7 +85,7 @@ series_id (PK)
 name
 
 
-books
+- books
 
 
 id
@@ -193,7 +193,7 @@ psql -d personal_library -f database/schema.sql
 
 \copy books FROM 'csv/libros-libros.csv' WITH CSV HEADER;
 
-##Roadmap
+## Roadmap
 
 Completed
 
