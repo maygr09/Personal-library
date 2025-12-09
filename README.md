@@ -166,24 +166,7 @@ Physical vs digital location tracking
 
 The database is structured for an easy backend integration.
 
-# How to Run the Project
 
-1. Clone the repository
-
-
-2. Create the database
-
-CREATE DATABASE personal_library;
-
-
-3. Import the schema
-
-psql -d personal_library -f database/schema.sql
-
-
-4. Import the data
-
-\copy books FROM 'csv/libros-libros.csv' WITH CSV HEADER;
 
 ## Roadmap
 
