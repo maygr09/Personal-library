@@ -7,12 +7,20 @@ import {
   deleteBook
 } from '../controllers/bookController.js';
 
+import {
+  createBookValidator,
+  updateBookValidator
+} from "../validators/bookValidators.js";
+
+import { idValidator } from "../validators/bookValidators.js";
+import { handleValidationErrors } from "../middleware/handleValidation.js";
+
 const router = express.Router();
 
 router.get("/", getBooks);
-router.get("/:id", fetchBookById);
-router.post("/", createBook);
-router.put("/:id", updateBook);
-router.delete("/:id", deleteBook);
+router.get("/:id", idValidator, handleValidationErrors, fetchBookById);
+router.post("/", createBookValidator, handleValidationErrors, createBook);
+router.put("/:id", idValidator, updateBookValidator, handleValidationErrors, updateBook);
+router.delete("/:id", idValidator, handleValidationErrors, deleteBook);
 
 export default router;
