@@ -2,6 +2,7 @@
 PostgreSQL project to manage and catalog my personal library of 950+ books.
 
 A full relational database system to organize and track my entire physical and digital book collection.
+Created with Node.js, Express, and PostgreSQL.
 This project started as a personal need to manage over 950 books, organize them by author, series, reading status, formats, and physical/digital location.
 I turned it into a complete technical project to showcase skills in:
 
@@ -19,209 +20,182 @@ GitHub version control
 
 Preparation for backend & frontend development
 
- 
-## Tech Stack
 
-PostgreSQL 16
 
-SQL (DDL & DML)
+## Technologies Used
 
-Git & GitHub
+Node.js
 
-CSV data imports
+Express
 
-(Upcoming) Node.js + Express (REST API)
+PostgreSQL
 
-(Upcoming) React (TypeScript + Tailwind)
+pg (node-postgres)
 
+Thunder Client / Postman
 
-## Project structure
+## API Endpoints
 
-personal-library/
+1. Get all books
 
- database/
+GET /api/books
 
-   schema.sql (full database structure)
+Response (200):
 
-   seeds.sql (sample seed data)
+[
+  {
+    "id": 1,
+    "title": "Book title",
+    "author_id": 3,
+    "series_id": null,
+    "genre": "Fantasy",
+    "status": "Read",
+    "format": "ePub"
+  }
+]
 
- csv/ (real data)
+2. Get a book by ID
 
-   ...
+GET /api/books/:id
 
- diagrams/ (ER diagrams and documentation)
+Example: /api/books/5
 
-   er-diagram.png (to add)
+Response (200):
 
- README.md
+{
+  "id": 5,
+  "title": "Example Book",
+  "author_id": 1,
+  "series_id": null,
+  "genre": "Drama",
+  "status": "Reading",
+  "format": "Paperback"
+}
 
 
-## Data Model (Summary)
+Errors:
 
-Main tables:
+404 Not Found — book does not exist
 
+3. Create a new book
 
-- authors
+POST /api/books
 
+Body example:
+{
+  "title": "The Hobbit",
+  "author": "J.R.R. Tolkien",
+  "series": "Middle-Earth",
+  "genre": "Fantasy",
+  "status": "Read",
+  "format": "ePub"
+}
 
-author_id (PK)
 
-name
+If series is empty or null, the book is created without a series (series_id = NULL).
 
+Response (201):
 
-- series
+{
+  "message": "Book created successfully"
+}
 
+4. Update a book
 
-series_id (PK)
+PATCH /api/books/:id
 
-name
+Body example:
+{
+  "format": "Paperback",
+  "status": "Completed",
+  "location": "iPhone/Books",
+  "publication_year": 2013
+}
 
 
-- books
+Only provided fields are updated.
 
+Response (200):
 
-id
+{
+  "message": "Book updated successfully"
+}
 
-title
 
-original_title
+Errors:
 
-series_id (FK)
+404 Not Found — book does not exist
 
-author_id (FK)
+5. Delete a book
 
-series_order (decimal)
+DELETE /api/books/:id
 
-status
+Example: /api/books/10
 
-date_started
+Response (200):
 
-date_finished
+{ "message": "Book deleted successfully" }
 
-date_unknown
 
-rating
+Errors:
 
-format
+404 Not Found — book does not exist
 
-genre
+## Database Structure
+- Table: authors
+Field	Type
+author_id	SERIAL PRIMARY KEY
+name	TEXT UNIQUE NOT NULL
+- Table: series
+Field	Type
+series_id	SERIAL PRIMARY KEY
+name	TEXT UNIQUE NOT NULL
+- Table: books
+Field	Type
+id	SERIAL PRIMARY KEY
+title	TEXT NOT NULL
+author_id	INTEGER REFERENCES authors(id)
+series_id	INTEGER REFERENCES series(id) NULL
+genre	TEXT
+status	TEXT
+format	TEXT
+location	TEXT
+publication_year	INTEGER
+- Useful Commands
+Start the server
+npm run dev
 
-location
+Install dependencies
+npm install
 
-publication_year
+- Testing with Thunder Client
 
-notes
+To test the API:
 
+Create a folder named Requests in the backend
 
-## Relationships
+Add files:
 
-One author → many books
+GET_all
 
-One series → many books
+POST_create
 
-Each book → one author + optional series
+PATCH_update
 
-All fully normalized to avoid duplication.
+DELETE_book
 
+Test each endpoint using real IDs from the database
 
-## Current Features
+## Next Steps (Frontend)
 
-- Fully normalized relational database
+After completing the backend:
 
+Create the React + Vite frontend
 
-Prevents duplicates in authors
+Build UI for listing books
 
-Enforces consistent year, date, and type values.
+Add forms for creating/editing
 
-- Bulk data import from CSV
+Connect frontend to backend
 
-
-With validation for:
-
-booleans
-
-partial dates
-
-empty fields
-
-decimal series order values
-
-
-- Useful queries included
-
-
-Read vs unread books
-
-Rating distribution
-
-Books per author
-
-Completed vs ongoing series
-
-Physical vs digital location tracking
-
-
-- API-ready
-
-
-The database is structured for an easy backend integration.
-
-
-
-## Roadmap
-
-Completed
-
- Data cleaning and normalization
-
- Professional SQL schema
- 
- Relationships and constraints
- 
- CSV → PostgreSQL migration
- 
- Full documentation (this README)
-
-
-In Progress
-
- Backend REST API (Node.js + Express + Prisma/pg)
-
-
-Future Plans
-
- React frontend (TypeScript + Vite + Tailwind)
-
- Advanced search
- 
- Dashboard with charts
- 
- Private login
- 
- Mobile app (React Native or Expo)
-
-
-## Project Purpose
-
-What began as a way to organize my personal library… is now a polished technical project that demonstrates:
-
-Ability to manage large structured datasets
-
-
-Real SQL expertise 
-
-System design & organization
-
-Full-stack readiness
-
-Clean GitHub workflow
-
-
-It’s a system I actually use every day — and a key part of my portfolio.
-
-
-## Author
-
-Mayra Gómez
-
-Cabin crew • Singer • Full-stack developer in training.
+Deploy (Render, Vercel, etc.)
