@@ -3,7 +3,32 @@ import pool from '../db/db.js';
 // GET all books
 export async function getBooks(req, res) {
   try {
-    const result = await pool.query('SELECT * FROM books');
+    const result = await pool.query(`
+      SELECT
+        b.id,
+        b.title,
+        b.original_title,
+        b.series_order,
+        b.status,
+        b.date_started,
+        b.date_finished,
+        b.date_unknown,
+        b.rating,
+        b.format,
+        b.genre,
+        b.location,
+        b.publication_year,
+        b.notes,
+
+        a.name AS author_name,
+        s.name AS series_name
+
+      FROM books b
+      JOIN authors a ON b.author_id = a.author_id
+      LEFT JOIN series s ON b.series_id = s.series_id
+      ORDER BY b.id DESC
+    `);
+
     res.json(result.rows);
   } catch (error) {
     console.error("DB ERROR:", error); 
