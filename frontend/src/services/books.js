@@ -21,3 +21,26 @@ export const getBooks = async () => {
 
   return response.json();
 };
+
+export const getBookById = async (id) => {
+  const res = await fetch(`http://localhost:3000/api/books/${id}`);
+  if (!res.ok) throw new Error("Error fetching book");
+  return res.json();
+};
+
+export const updateBook = async (id, book) => {
+  const res = await fetch(`http://localhost:3000/api/books/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(book),
+  });
+  if (!res.ok) throw new Error("Error updating book");
+  return res.json();
+};
+
+export const deleteBook = async (id) => {
+  const res = await fetch(`http://localhost:3000/api/books/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("Error deleting book");
+};

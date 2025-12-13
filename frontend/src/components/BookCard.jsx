@@ -1,4 +1,15 @@
+import { Link } from "react-router-dom";
+import { deleteBook } from "../services/books";
+
 export default function BookCard({ book }) {
+
+  const handleDelete = async () => {
+    if (confirm("Delete this book?")) {
+      await deleteBook(book.id);
+      window.location.reload();
+    }
+  };
+
   return (
     <div className="p-4 border rounded-lg bg-white shadow-sm">
       <h2 className="text-lg font-semibold">{book.title}</h2>
@@ -42,6 +53,23 @@ export default function BookCard({ book }) {
           {book.notes}
         </p>
       )}
+
+      {/* 👇 BOTONES */}
+      <div className="mt-3 flex gap-3">
+        <Link
+          to={`/edit/${book.id}`}
+          className="text-sm text-purple-600 hover:underline"
+        >
+          Edit
+        </Link>
+
+        <button
+          onClick={handleDelete}
+          className="text-sm text-red-600 hover:underline"
+        >
+          Delete
+        </button>
+      </div>
     </div>
   );
 }
