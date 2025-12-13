@@ -14,25 +14,25 @@ export const createBookValidator = [
     .isString()
     .withMessage("Author must be a string"),
 
-  body("series")
-    .optional()
-    .isString()
-    .withMessage("Series must be a string"),
+ body("series")
+  .optional({ nullable: true, checkFalsy: true })
+  .isString()
+  .withMessage("Series must be a string"),
 
-  body("series_order")
-    .optional()
-    .isFloat({ min: 0})
-    .withMessage("Series order must be a number (decimals allowed"),
+body("series_order")
+  .optional({ nullable: true, checkFalsy: true })
+  .isFloat({ min: 0 })
+  .withMessage("Series order must be a number (decimals allowed)"),
 
   body("publication_year")
     .notEmpty()
     .isInt({ min: 0 })
     .withMessage("Publication year must be a valid number"),
 
-  body("rating")
-    .optional()
-    .isInt({ min: 1, max: 5 })
-    .withMessage("Rating must be an integer between 1 and 5"),
+ body("rating")
+  .optional({ nullable: true, checkFalsy: true })
+  .isInt({ min: 1, max: 5 })
+  .withMessage("Rating must be an integer between 1 and 5"),
 
   body("format")
     .optional()

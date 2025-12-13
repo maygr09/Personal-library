@@ -52,19 +52,25 @@ export default function BookForm({ initialData, onSubmit, submitLabel }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const payload = {
-      ...formData,
-      series: formData.series || null,
-      series_order: formData.series ? formData.series_order || null : null,
-      date_started:
-        formData.status === "Leido" && !formData.date_unknown
-          ? formData.date_started || null
-          : null,
-      date_finished:
-        formData.status === "Leido" && !formData.date_unknown
-          ? formData.date_finished || null
-          : null,
-    };
+const payload = Object.fromEntries(
+  Object.entries({
+    ...formData,
+    series: formData.series || null,
+    series_order: formData.series ? formData.series_order || null : null,
+    date_started:
+      formData.status === "Leido" && !formData.date_unknown
+        ? formData.date_started || null
+        : null,
+    date_finished:
+      formData.status === "Leido" && !formData.date_unknown
+        ? formData.date_finished || null
+        : null,
+  }).filter(([key, value]) => {
+    if (value === "") return false;
+    if (key === "rating" && value === 0) return false;
+    return true;
+  })
+);
 
     onSubmit(payload);
   };

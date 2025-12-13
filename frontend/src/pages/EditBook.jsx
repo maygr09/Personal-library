@@ -35,11 +35,27 @@ export default function EditBook() {
 
       <h1 className="text-3xl font-bold my-6">Edit Book</h1>
 
-      <BookForm
-        initialData={book}
-        onSubmit={handleUpdate}
-        submitLabel="Update book"
-      />
+     <BookForm
+  initialData={{
+    title: book.title ?? "",
+    original_title: book.original_title ?? "",
+    author: book.author_name ?? "",
+    series: book.series_name ?? "",
+    series_order: book.series_order ?? "",
+    status: book.status ?? "Pendiente",
+    date_started: book.date_started ?? "",
+    date_finished: book.date_finished ?? "",
+    date_unknown: book.date_unknown ?? false,
+    rating: book.rating ?? "",
+    format: book.format ?? "",
+    genre: book.genre ?? "",
+    location: book.location ?? "",
+    publication_year: book.publication_year ?? "",
+    notes: book.notes ?? "",
+  }}
+  onSubmit={handleUpdate}
+  submitLabel="Update book"
+/>
     </div>
   );
 }

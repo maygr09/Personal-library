@@ -56,34 +56,34 @@ export async function fetchBookById (req, res) {
 
 
 async function findOrCreateAuthor(authorName) {
-    const searchQuery = "SELECT author_id FROM authors WHERE name = $1 LIMIT 1";
-    const result = await pool.query(searchQuery, [authorName]);
+  const searchQuery = "SELECT author_id FROM authors WHERE name = $1 LIMIT 1";
+  const result = await pool.query(searchQuery, [authorName]);
 
-    if (result.rows.length > 0) {
-        return result.rows[0].author_id;  // autor existente
-    }
+  if (result.rows.length > 0) {
+    return result.rows[0].author_id;
+  }
 
-    // si no existe: crearlo
-    const insertQuery = "INSERT INTO authors (name) VALUES ($1) RETURNING author_id";
-    const insertResult = await pool.query(insertQuery, [authorName]);
+  const insertQuery =
+    "INSERT INTO authors (name) VALUES ($1) RETURNING author_id";
+  const insertResult = await pool.query(insertQuery, [authorName]);
 
-    return insertResult.rows[0].id;  // autor nuevo
+  return insertResult.rows[0].author_id; 
 }
 
 
 async function findOrCreateSeries(seriesName) {
-    const searchQuery = "SELECT series_id FROM series WHERE name = $1 LIMIT 1";
-    const result = await pool.query(searchQuery, [seriesName]);
+  const searchQuery = "SELECT series_id FROM series WHERE name = $1 LIMIT 1";
+  const result = await pool.query(searchQuery, [seriesName]);
 
-    if (result.rows.length > 0) {
-        return result.rows[0].series_id;  // serie existente
-    }
+  if (result.rows.length > 0) {
+    return result.rows[0].series_id;
+  }
 
-    // si no existe: crearlo
-    const insertQuery = "INSERT INTO series (name) VALUES ($1) RETURNING series_id";
-    const insertResult = await pool.query(insertQuery, [seriesName]);
+  const insertQuery =
+    "INSERT INTO series (name) VALUES ($1) RETURNING series_id";
+  const insertResult = await pool.query(insertQuery, [seriesName]);
 
-    return insertResult.rows[0].id;  // serie nueva
+  return insertResult.rows[0].series_id; 
 }
 
 
@@ -93,6 +93,7 @@ export async function createBook (req, res) {
   const { title, author, format, status, genre, series = null } = req.body;
 
   const author_id = await findOrCreateAuthor(author);
+
   let series_id = null;
   if (series) {  
     series_id = await findOrCreateSeries(series);
@@ -163,7 +164,7 @@ export const updateBook = async (req, res) => {
       }
     }
 
-    // buscar/crear series (si viene)
+    // buscar/crear series
     let series_id = null;
     if (typeof series !== "undefined" && series !== null && series !== "") {
       const seriesRes = await pool.query(
@@ -203,22 +204,22 @@ export const updateBook = async (req, res) => {
     `;
 
     const values = [
-      title ?? null,
-      original_title ?? null,
-      author ?? null,
-      series ?? null,
-      series_order ?? null,
-      date_started ?? null,
-      date_finished ?? null,
-      date_unknown ?? null,
-      rating ?? null,
-      genre ?? null,
-      status ?? null,
-      format ?? null,
-      location ?? null,
-      publication_year ?? null,
-      id
-    ];
+  title ?? null,
+  original_title ?? null,
+  author_id,       
+  series_id,        
+  series_order ?? null,
+  date_started ?? null,
+  date_finished ?? null,
+  date_unknown ?? null,
+  rating ?? null,
+  genre ?? null,
+  status ?? null,
+  format ?? null,
+  location ?? null,
+  publication_year ?? null,
+  id
+];
 
     const updateResult = await pool.query(updateQuery, values);
 
@@ -227,9 +228,12 @@ export const updateBook = async (req, res) => {
       book: updateResult.rows[0]
     });
   } catch (error) {
-    console.error("Error updating book:", error);
-    res.status(500).json({ message: "Error updating book" });
-  }
+  console.error("UPDATE BOOK ERROR:", error);
+  res.status(500).json({
+    message: "Error updating book",
+    error: error.message,
+  });
+}
 };
 
 

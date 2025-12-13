@@ -54,7 +54,7 @@ export default function BookCard({ book }) {
         </p>
       )}
 
-      {/* 👇 BOTONES */}
+      {/* BOTONES */}
       <div className="mt-3 flex gap-3">
         <Link
           to={`/edit/${book.id}`}
