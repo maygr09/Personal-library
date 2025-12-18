@@ -1,7 +1,7 @@
-const API_URL = "http://localhost:3000/api/books";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/books`;
 
 export const createBook = async (book) => {
-  const res = await fetch("http://localhost:3000/api/books", {
+  const res = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(book),
@@ -23,13 +23,13 @@ export const getBooks = async () => {
 };
 
 export const getBookById = async (id) => {
-  const res = await fetch(`http://localhost:3000/api/books/${id}`);
+  const res = await fetch(`${API_URL}/${id}`);
   if (!res.ok) throw new Error("Error fetching book");
   return res.json();
 };
 
 export const updateBook = async (id, book) => {
-  const res = await fetch(`http://localhost:3000/api/books/${id}`, {
+  const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(book),
@@ -39,7 +39,7 @@ export const updateBook = async (id, book) => {
 };
 
 export const deleteBook = async (id) => {
-  const res = await fetch(`http://localhost:3000/api/books/${id}`, {
+  const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Error deleting book");
