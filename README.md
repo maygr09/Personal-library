@@ -1,201 +1,154 @@
-# Personal-library
-PostgreSQL project to manage and catalog my personal library of 950+ books.
+# Personal library
 
-A full relational database system to organize and track my entire physical and digital book collection.
-Created with Node.js, Express, and PostgreSQL.
-This project started as a personal need to manage over 950 books, organize them by author, series, reading status, formats, and physical/digital location.
-I turned it into a complete technical project to showcase skills in:
+A full-stack application to manage and catalog a personal library of 950+ books, built from scratch using PostgreSQL, Node.js, Express, and React (Vite).
 
-Database modeling
+This project started as a personal need to organize a large physical and digital book collection and evolved into a complete production-ready system, covering database design, backend API development, frontend integration, and cloud deployment.
 
-Normalization
+## Features
 
-Professional PostgreSQL usage
+Full CRUD operations for books
 
-Bulk data loading & data cleaning
+Advanced search functionality:
 
-Relational design (PK, FK, constraints)
+Search by title, original title, author, and series
 
-GitHub version control
+Case-insensitive search
 
-Preparation for backend & frontend development
+Fuzzy matching with “Did you mean?” suggestions
 
+Relational data model with:
 
+- Authors
 
-## Technologies Used
+- Series
 
-Node.js
+- Books
 
-Express
+Clean UX:
 
-PostgreSQL
+- Real-time search
 
-pg (node-postgres)
+- Reset to full catalog when input is cleared
+
+- Production deployment with separated frontend and backend
+
+## Technical Highlights
+
+Relational database modeling and normalization
+
+Proper use of:
+
+- Primary keys
+
+- Foreign keys
+
+- Constraints
+
+Data migration from local PostgreSQL to cloud PostgreSQL
+
+Environment-based configuration (local vs production)
+
+Monorepo architecture (frontend + backend)
+
+Debugging and fixing real production issues
+
+## Tech Stack
+Backend
+
+- Node.js
+
+- Express
+
+- PostgreSQL
+
+- node-postgres (pg)
+
+- REST API
+
+Frontend
+
+- React
+
+- Vite
+
+- JavaScript
+
+- CSS
+
+Infrastructure / Tools
+
+Render (Backend & PostgreSQL)
+
+Vercel (Frontend)
+
+GitHub
 
 Thunder Client / Postman
 
+##  Live Demo
+
+Frontend (Vercel):
+https://personal-library-gold.vercel.app
+
+Backend API (Render):
+https://personal-library-backend-tflw.onrender.com/api/books
+
 ## API Endpoints
 
-1. Get all books
-
+Get all books
 GET /api/books
 
-Response (200):
+Search books
+GET /api/books/search?q=twilight
 
-[
-  {
-    "id": 1,
-    "title": "Book title",
-    "author_id": 3,
-    "series_id": null,
-    "genre": "Fantasy",
-    "status": "Read",
-    "format": "ePub"
-  }
-]
 
-2. Get a book by ID
+Supports:
 
+Titles
+
+Original titles
+
+Authors
+
+Series
+Includes fuzzy matching and suggestions.
+
+Get book by ID
 GET /api/books/:id
 
-Example: /api/books/5
-
-Response (200):
-
-{
-  "id": 5,
-  "title": "Example Book",
-  "author_id": 1,
-  "series_id": null,
-  "genre": "Drama",
-  "status": "Reading",
-  "format": "Paperback"
-}
-
-
-Errors:
-
-404 Not Found — book does not exist
-
-3. Create a new book
-
+Create a book
 POST /api/books
 
-Body example:
-{
-  "title": "The Hobbit",
-  "author": "J.R.R. Tolkien",
-  "series": "Middle-Earth",
-  "genre": "Fantasy",
-  "status": "Read",
-  "format": "ePub"
-}
-
-
-If series is empty or null, the book is created without a series (series_id = NULL).
-
-Response (201):
-
-{
-  "message": "Book created successfully"
-}
-
-4. Update a book
-
+Update a book
 PATCH /api/books/:id
 
-Body example:
-{
-  "format": "Paperback",
-  "status": "Completed",
-  "location": "iPhone/Books",
-  "publication_year": 2013
-}
-
-
-Only provided fields are updated.
-
-Response (200):
-
-{
-  "message": "Book updated successfully"
-}
-
-
-Errors:
-
-404 Not Found — book does not exist
-
-5. Delete a book
-
+Delete a book
 DELETE /api/books/:id
 
-Example: /api/books/10
+## Database Schema
 
-Response (200):
+authors
 
-{ "message": "Book deleted successfully" }
+series
 
+books
 
-Errors:
+All relationships are enforced with foreign keys and constraints.
 
-404 Not Found — book does not exist
+## What I Learned
 
-## Database Structure
-- Table: authors
-Field	Type
-author_id	SERIAL PRIMARY KEY
-name	TEXT UNIQUE NOT NULL
-- Table: series
-Field	Type
-series_id	SERIAL PRIMARY KEY
-name	TEXT UNIQUE NOT NULL
-- Table: books
-Field	Type
-id	SERIAL PRIMARY KEY
-title	TEXT NOT NULL
-author_id	INTEGER REFERENCES authors(id)
-series_id	INTEGER REFERENCES series(id) NULL
-genre	TEXT
-status	TEXT
-format	TEXT
-location	TEXT
-publication_year	INTEGER
-- Useful Commands
-Start the server
-npm run dev
+Designing and migrating relational databases
 
-Install dependencies
-npm install
+Connecting backend services to cloud-hosted PostgreSQL
 
-- Testing with Thunder Client
+Managing environment variables across platforms
 
-To test the API:
+Deploying and debugging a real full-stack application
 
-Create a folder named Requests in the backend
+Handling search logic and UX considerations
 
-Add files:
+## Status
 
-GET_all
-
-POST_create
-
-PATCH_update
-
-DELETE_book
-
-Test each endpoint using real IDs from the database
-
-## Next Steps (Frontend)
-
-After completing the backend:
-
-Create the React + Vite frontend
-
-Build UI for listing books
-
-Add forms for creating/editing
-
-Connect frontend to backend
-
-Deploy (Render, Vercel, etc.)
+- Backend complete
+- Frontend complete
+- Production deployment complete
