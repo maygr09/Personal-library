@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getBooks,
+  searchBooks,
   fetchBookById,
   createBook,
   updateBook,
@@ -18,6 +19,7 @@ import { handleValidationErrors } from "../middleware/handleValidation.js";
 const router = express.Router();
 
 router.get("/", getBooks);
+router.get("/search", searchBooks);
 router.get("/:id", idValidator, handleValidationErrors, fetchBookById);
 router.post("/", createBookValidator, handleValidationErrors, createBook);
 router.put("/:id", idValidator, updateBookValidator, handleValidationErrors, updateBook);

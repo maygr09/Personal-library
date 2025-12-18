@@ -36,6 +36,68 @@ export async function getBooks(req, res) {
   }
 };
 
+// SEARCH books
+export const searchBooks = async (req, res) => {
+  const { q } = req.query;
+
+  if (!q || q.trim() === "") {
+    return res.status(400).json({ message: "Search query is required" });
+  }
+
+  try {
+    // búsqueda normal (LA TUYA, intacta)
+    const searchQuery = `
+      SELECT
+        b.*,
+        a.name AS author_name,
+        s.name AS series_name
+      FROM books b
+      JOIN authors a ON b.author_id = a.author_id
+      LEFT JOIN series s ON b.series_id = s.series_id
+      WHERE
+        b.title ILIKE '%' || $1 || '%'
+        OR b.original_title ILIKE '%' || $1 || '%'
+        OR a.name ILIKE '%' || $1 || '%'
+        OR s.name ILIKE '%' || $1 || '%'
+      ORDER BY b.title;
+    `;
+
+    const result = await pool.query(searchQuery, [q]);
+
+    // Sí hay resultados
+    if (result.rows.length > 0) {
+      return res.json({
+        results: result.rows
+      });
+    }
+
+    // No hay resultados, buscamos sugerencia
+    const suggestionQuery = `
+      SELECT
+        b.title
+      FROM books b
+      ORDER BY GREATEST(
+        similarity(b.title, $1),
+        similarity(b.original_title, $1)
+      ) DESC
+      LIMIT 1;
+    `;
+
+    const suggestionResult = await pool.query(suggestionQuery, [q]);
+
+    return res.json({
+      results: [],
+      didYouMean: suggestionResult.rows[0]?.title || null
+    });
+
+  } catch (error) {
+    console.error("SEARCH BOOKS ERROR:", error);
+    res.status(500).json({ message: "Error searching books" });
+  }
+};
+
+
+
 // GET book by ID 
 export async function fetchBookById (req, res) {
   try {
