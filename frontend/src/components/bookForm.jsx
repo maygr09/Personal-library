@@ -58,11 +58,11 @@ const payload = Object.fromEntries(
     series: formData.series || null,
     series_order: formData.series ? formData.series_order || null : null,
     date_started:
-      formData.status === "Leido" && !formData.date_unknown
+      formData.status === "Leído" && !formData.date_unknown
         ? formData.date_started || null
         : null,
     date_finished:
-      formData.status === "Leido" && !formData.date_unknown
+      formData.status === "Leído" && !formData.date_unknown
         ? formData.date_finished || null
         : null,
   }).filter(([key, value]) => {
@@ -111,8 +111,18 @@ const payload = Object.fromEntries(
         className="w-full border p-2 rounded"
       >
         <option value="Pendiente">Pendiente</option>
-        <option value="Leido">Leido</option>
+        <option value="Leído">Leído</option>
       </select>
+
+       {formData.series && (
+        <input
+          name="rating"
+          placeholder="Rating"
+          value={formData.rating || ""}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        />
+      )}
 
       <input
         name="series"
@@ -132,7 +142,7 @@ const payload = Object.fromEntries(
         />
       )}
 
-      {formData.status === "Leido" && (
+      {formData.status === "Leído" && (
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -144,7 +154,7 @@ const payload = Object.fromEntries(
         </label>
       )}
 
-      {formData.status === "Leido" && !formData.date_unknown && (
+      {formData.status === "Leído" && !formData.date_unknown && (
         <>
           <input
             type="date"
