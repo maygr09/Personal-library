@@ -12,8 +12,10 @@ export const createBook = async (book) => {
 };
 
 
-export const getBooks = async () => {
-  const response = await fetch(API_URL);
+export const getBooks = async (filters = {}) => {
+  const params = new URLSearchParams(filters).toString();
+
+  const response = await fetch(`${API_URL}?${params}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch books");

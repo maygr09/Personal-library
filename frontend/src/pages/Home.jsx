@@ -5,6 +5,8 @@ import BookCard from "../components/BookCard";
 
 export default function Home() {
   const [books, setBooks] = useState([]);
+  const [filter, setFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("date_finished");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
@@ -13,7 +15,17 @@ export default function Home() {
 
 
   useEffect(() => {
-    getBooks()
+    const filters = {};
+
+      if (filter !== "all") {
+        filters.status = filter;
+      }
+      if (sortBy) {
+        filters.sort = sortBy;
+        filters.order = "desc";
+      }
+      
+    getBooks(filters)
       .then((data) => {
         setBooks(data);
         setLoading(false);
@@ -22,7 +34,7 @@ export default function Home() {
         setError(err.message);
         setLoading(false);
       });
-  }, []);
+  }, [filter, sortBy]);
 
   useEffect(() => {
   // Si el input queda vacío, volvemos a cargar todos los libros
@@ -127,6 +139,27 @@ const handleSearch = async (e) => {
 {!searching && books.length === 0 && !suggestion && (
   <p className="text-gray-500">No books found.</p>
 )}
+{/* Filters */}
+<div className="flex items-center gap-4 mb-4">
+  <select
+    onChange={(e) => setFilter(e.target.value)}
+    className="border border-gray-300 rounded"
+  >
+    <option value="Todos">Todos</option>
+    <option value="Leídos">Leídos</option>
+    <option value="Pendientes">Pendientes</option>
+  </select>
+
+  <select
+    onChange={(e) => setSortBy(e.target.value)}
+    className="border border-gray-300 rounded"
+  >
+    <option value="date_finished">Fecha de termino</option>
+    <option value="date_started">Fecha de inicio</option>
+    <option value="title">Título</option>
+  </select>
+</div>
+
       {/* Books grid */}
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
   {books.map((book) => (
