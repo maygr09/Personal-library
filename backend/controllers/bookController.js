@@ -3,7 +3,8 @@ import pool from '../db/db.js';
 // GET all books
 export async function getBooks(req, res) {
   try {
-    const result = await pool.query(`
+    const { status, sort, order } = req.query;
+    let query =`
       SELECT
         b.id,
         b.title,
@@ -26,9 +27,37 @@ export async function getBooks(req, res) {
       FROM books b
       JOIN authors a ON b.author_id = a.author_id
       LEFT JOIN series s ON b.series_id = s.series_id
-      ORDER BY b.id DESC
-    `);
+    `;
 
+    let conditions = [];
+    let values = [];
+
+    // filtro por status
+    if (status) {
+      values.push(status);
+      conditions.push(`b.status = $${values.length}`);
+    }
+
+    // aplicar condiciones
+    if (conditions.length > 0) {
+      query += " WHERE " + conditions.join(" AND ");
+    }
+
+    // ordenación
+    const validSortFields = ["date_finished", "date_started", "title", "id"];
+    const validOrder = ["asc", "desc"];
+
+    if (validSortFields.includes(sort)) {
+      const orderDirection = validOrder.includes(order?.toLowerCase()) 
+        ? order.toUpperCase() 
+        : "DESC";
+
+      query += ` ORDER BY b.${sort} ${orderDirection}`;
+    } else {
+      query += " ORDER BY b.title DESC"; //comportameiento original
+    }
+    const result = await pool.query(query, values);
+    
     res.json(result.rows);
   } catch (error) {
     console.error("DB ERROR:", error); 
