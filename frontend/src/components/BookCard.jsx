@@ -10,6 +10,26 @@ export default function BookCard({ book }) {
     }
   };
 
+  const getYearLabel = () => {
+    if (book.date_unknown) return null;
+
+    const start = book.date_started;
+    const end = book.date_finished;
+
+    if (!start && !end) return null;
+
+    const startYear = start ? new Date(start).getFullYear() : null;
+    const endYear = end ? new Date(end).getFullYear() : null;
+
+    if (startYear && endYear) {
+      return startYear === endYear
+        ? `${startYear}`
+        : `${startYear}–${endYear}`;
+  }
+
+  return startYear || endYear;
+  };
+
   return (
     <div className="p-4 border rounded-lg bg-white shadow-sm">
       <h2 className="text-lg font-semibold">{book.title}</h2>
@@ -29,12 +49,24 @@ export default function BookCard({ book }) {
         Status: {book.status}
       </p>
 
-      {book.status === "Leido" && !book.date_unknown && (
-        <div className="text-sm text-gray-600">
-          {book.date_started && <p>Started: {book.date_started}</p>}
-          {book.date_finished && <p>Finished: {book.date_finished}</p>}
-        </div>
-      )}
+      {book.status === "Leído" && (
+  <>
+    {!book.date_unknown ? (
+      <div className="text-sm text-gray-600">
+        {book.date_started && <p>Started: {book.date_started}</p>}
+        {book.date_finished && <p>Finished: {book.date_finished}</p>}
+
+        {getYearLabel() && (
+          <p className="text-gray-500">{getYearLabel()}</p>
+        )}
+      </div>
+    ) : (
+      <p className="text-sm text-gray-400 italic">
+        Fecha desconocida
+      </p>
+    )}
+  </>
+)}
 
       {book.rating && (
         <p className="mt-2 text-sm">Rating: ⭐ {book.rating}</p>

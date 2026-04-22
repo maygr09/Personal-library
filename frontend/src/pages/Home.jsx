@@ -5,8 +5,12 @@ import BookCard from "../components/BookCard";
 
 export default function Home() {
   const [books, setBooks] = useState([]);
+  const [allBooks, setAllBooks] = useState([]);
+  const totalBooks = allBooks.length;
+  const readCount = allBooks.filter(b => b.status === "Leído").length;
+  const pendingCount = allBooks.filter(b => b.status === "Pendiente").length;
   const [filter, setFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("date_finished");
+  const [sortBy, setSortBy] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
@@ -22,19 +26,24 @@ export default function Home() {
       }
       if (sortBy) {
         filters.sort = sortBy;
-        filters.order = "desc";
       }
       
     getBooks(filters)
       .then((data) => {
         setBooks(data);
-        setLoading(false);
+        setAllBooks(data);
       })
       .catch((err) => {
         setError(err.message);
         setLoading(false);
       });
   }, [filter, sortBy]);
+
+  useEffect(() => {
+  if (filter === "Leído" && !sortBy) {
+    setSortBy("date_finished");
+  }
+  }, [filter]);
 
   useEffect(() => {
   // Si el input queda vacío, volvemos a cargar todos los libros
@@ -139,25 +148,48 @@ const handleSearch = async (e) => {
 {!searching && books.length === 0 && !suggestion && (
   <p className="text-gray-500">No books found.</p>
 )}
-{/* Filters */}
-<div className="flex items-center gap-4 mb-4">
-  <select
-    onChange={(e) => setFilter(e.target.value)}
-    className="border border-gray-300 rounded"
-  >
-    <option value="Todos">Todos</option>
-    <option value="Leídos">Leídos</option>
-    <option value="Pendientes">Pendientes</option>
-  </select>
+
+<div className="flex items-center justify-between mb-4">
+
+  {/* IZQUIERDA: filtros */}
+  <div className="flex gap-4">
+    <select
+      onChange={(e) => setFilter(e.target.value)}
+      className="border border-gray-300 rounded px-2"
+    >
+      <option value="all">Todos</option>
+      <option value="Leído">Leídos</option>
+      <option value="Pendiente">Pendientes</option>
+    </select>
+  </div>
+
+  {/* DERECHA: contadores */}
+  <div className="text-sm text-gray-600 text-right">
+    {filter === "all" && <p> Total: {totalBooks}</p>}
+    {filter === "Leído" && <p> Leídos: {readCount}</p>}
+    {filter === "Pendiente" && <p> Pendientes: {pendingCount}</p>}
+  </div>
 
   <select
-    onChange={(e) => setSortBy(e.target.value)}
-    className="border border-gray-300 rounded"
-  >
-    <option value="date_finished">Fecha de termino</option>
-    <option value="date_started">Fecha de inicio</option>
-    <option value="title">Título</option>
-  </select>
+  onChange={(e) => setSortBy(e.target.value)}
+  className="border border-gray-300 rounded px-2"
+>
+  <option value="">Ordenar por...</option>
+
+  <option value="title_asc">Título A → Z</option>
+  <option value="title_desc">Título Z → A</option>
+
+  <option value="author_asc">Autor A → Z</option>
+  <option value="author_desc">Autor Z → A</option>
+
+  {filter === "Leído" && (
+    <>
+      <option value="date_desc">Más recientes</option>
+      <option value="date_asc">Más antiguos</option>
+    </>
+  )}
+</select>
+
 </div>
 
       {/* Books grid */}

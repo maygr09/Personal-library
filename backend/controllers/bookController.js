@@ -44,18 +44,40 @@ export async function getBooks(req, res) {
     }
 
     // ordenación
-    const validSortFields = ["date_finished", "date_started", "title", "id"];
-    const validOrder = ["asc", "desc"];
+    // ordenación avanzada
+    if (sort === "title_asc") {
+      query += " ORDER BY b.title ASC";
 
-    if (validSortFields.includes(sort)) {
-      const orderDirection = validOrder.includes(order?.toLowerCase()) 
-        ? order.toUpperCase() 
-        : "DESC";
+    } else if (sort === "title_desc") { 
+      query += " ORDER BY b.title DESC";
 
-      query += ` ORDER BY b.${sort} ${orderDirection}`;
+    } else if (sort === "author_asc") {
+      query += " ORDER BY a.name ASC";
+
+    } else if (sort === "author_desc") {
+      query += " ORDER BY a.name DESC";
+
+    } else if (sort === "date_desc") {
+      query += `
+        ORDER BY
+          (b.date_finished IS NULL) ASC,
+          b.date_finished DESC,
+          b.title ASC
+      `;
+
+    } else if (sort === "date_asc") {
+      query += `
+        ORDER BY
+          (b.date_finished IS NULL) ASC,
+          b.date_finished ASC,
+          b.title ASC
+      `;
+
     } else {
-      query += " ORDER BY b.title DESC"; //comportameiento original
+      query += " ORDER BY b.id DESC"; // fallback
     }
+   
+
     const result = await pool.query(query, values);
     
     res.json(result.rows);
