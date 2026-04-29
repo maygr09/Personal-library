@@ -16,7 +16,19 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [suggestion, setSuggestion] = useState(null);
   const [searching, setSearching] = useState(false);
+  const [goal, setGoal] = useState("");
 
+  const currentYear = new Date().getFullYear();
+
+  const booksReadThisYear = allBooks.filter(book => {
+    return (
+      book.status === "Leído" &&
+      book.date_finished &&
+      new Date(book.date_finished).getFullYear() === currentYear
+    );
+  }).length;
+
+  const progress = Math.min((booksReadThisYear / goal) * 100, 100);
 
   useEffect(() => {
     const filters = {};
@@ -62,6 +74,15 @@ export default function Home() {
       });
   }
 }, [query]);
+
+useEffect(() => {
+  const savedGoal = localStorage.getItem("readingGoal");
+  if (savedGoal) setGoal(Number(savedGoal));
+}, []);
+
+useEffect(() => {
+  localStorage.setItem("readingGoal", goal);
+}, [goal]);
 
 
 const handleSearch = async (e) => {
@@ -148,6 +169,30 @@ const handleSearch = async (e) => {
 {!searching && books.length === 0 && !suggestion && (
   <p className="text-gray-500">No books found.</p>
 )}
+
+<div className="mb-6">
+  <h2 className="text-lg font-semibold mb-2">
+    📖 Reading Goal {currentYear}
+  </h2>
+
+  <div className="w-full bg-gray-200 rounded-full h-4">
+    <div
+      className="bg-purple-600 h-4 rounded-full transition-all"
+      style={{ width: `${progress}%` }}
+    ></div>
+  </div>
+
+  <p className="text-sm mt-2 text-gray-600">
+    {booksReadThisYear} / {goal} books read
+  </p>
+</div>
+
+<input
+  type="number"
+  value={goal}
+  onChange={(e) => setGoal(Number(e.target.value))}
+  className="mt-2 border rounded px-2 py-1 w-24"
+/>
 
 <div className="flex items-center justify-between mb-4">
 
