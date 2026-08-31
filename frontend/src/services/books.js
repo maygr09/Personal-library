@@ -46,3 +46,8 @@ export const deleteBook = async (id) => {
   });
   if (!res.ok) throw new Error("Error deleting book");
 };
+export const searchBooks = async (query) => {
+  const res = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}`);
+  if (!res.ok) throw new Error("Error searching books");
+  return res.json();
+};

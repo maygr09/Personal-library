@@ -1,1 +1,26 @@
 @import "tailwindcss";
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes book-open {
+  from {
+    transform: perspective(1200px) rotateY(-100deg);
+    opacity: 0;
+  }
+  to {
+    transform: perspective(1200px) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+.book-modal-backdrop {
+  animation: fade-in 0.2s ease forwards;
+}
+
+.book-modal-card {
+  transform-origin: left center;
+  animation: book-open 0.35s ease forwards;
+}

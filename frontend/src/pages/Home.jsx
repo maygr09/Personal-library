@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { getBooks } from "../services/books";
-import BookCard from "../components/BookCard";
+import { getBooks, searchBooks } from "../services/books";
+import GenreShelf from "../components/GenreShelf";
+import BookModal from "../components/BookModal";
+
+const DEFAULT_READING_GOAL = 12;
 
 export default function Home() {
   const [books, setBooks] = useState([]);
@@ -16,7 +19,8 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [suggestion, setSuggestion] = useState(null);
   const [searching, setSearching] = useState(false);
-  const [goal, setGoal] = useState("");
+  const [goal, setGoal] = useState(DEFAULT_READING_GOAL);
+  const [selectedBook, setSelectedBook] = useState(null);
 
   const currentYear = new Date().getFullYear();
 
@@ -29,6 +33,23 @@ export default function Home() {
   }).length;
 
   const progress = Math.min((booksReadThisYear / goal) * 100, 100);
+
+  // Agrupa los libros que se están mostrando (ya filtrados/buscados) en "estantes" por género.
+  const shelves = useMemo(() => {
+    const map = new Map();
+    for (const book of books) {
+      const genre = book.genre && book.genre.trim() ? book.genre.trim() : "Sin género";
+      if (!map.has(genre)) map.set(genre, []);
+      map.get(genre).push(book);
+    }
+    const entries = Array.from(map.entries());
+    entries.sort(([a], [b]) => {
+      if (a === "Sin género") return 1;
+      if (b === "Sin género") return -1;
+      return a.localeCompare(b, "es");
+    });
+    return entries;
+  }, [books]);
 
   useEffect(() => {
     const filters = {};
@@ -44,6 +65,7 @@ export default function Home() {
       .then((data) => {
         setBooks(data);
         setAllBooks(data);
+        setLoading(false);
       })
       .catch((err) => {
         setError(err.message);
@@ -94,14 +116,10 @@ const handleSearch = async (e) => {
   setError(null);
 
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/books/search?q=${encodeURIComponent(query)}`
-    );
-    const data = await res.json();
-
+    const data = await searchBooks(query);
     setBooks(data.results || []);
     setSuggestion(data.didYouMean || null);
-  } catch (err) {
+  } catch {
     setError("Error searching books");
   } finally {
     setSearching(false);
@@ -237,12 +255,19 @@ const handleSearch = async (e) => {
 
 </div>
 
-      {/* Books grid */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-  {books.map((book) => (
-    <BookCard key={book.id} book={book} />
-  ))}
-</div>
+      {/* Estantes por género */}
+      <div className="space-y-8">
+        {shelves.map(([genre, genreBooks]) => (
+          <GenreShelf
+            key={genre}
+            genre={genre}
+            books={genreBooks}
+            onSelectBook={setSelectedBook}
+          />
+        ))}
+      </div>
+
+      <BookModal book={selectedBook} onClose={() => setSelectedBook(null)} />
 </div>
   );
 }
