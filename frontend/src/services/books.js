@@ -1,53 +1,20 @@
-const API_URL = `${import.meta.env.VITE_API_URL}/api/books`;
+import { api } from "./api";
 
-export const createBook = async (book) => {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(book),
-  });
+export const createBook = (book) =>
+  api("/api/books", { method: "POST", body: book });
 
-  if (!res.ok) throw new Error("Error creating book");
-  return res.json();
-};
-
-
-export const getBooks = async (filters = {}) => {
+export const getBooks = (filters = {}) => {
   const params = new URLSearchParams(filters).toString();
-
-  const response = await fetch(`${API_URL}?${params}`);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch books");
-  }
-
-  return response.json();
+  return api(`/api/books?${params}`);
 };
 
-export const getBookById = async (id) => {
-  const res = await fetch(`${API_URL}/${id}`);
-  if (!res.ok) throw new Error("Error fetching book");
-  return res.json();
-};
+export const searchBooks = (query) =>
+  api(`/api/books/search?q=${encodeURIComponent(query)}`);
 
-export const updateBook = async (id, book) => {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(book),
-  });
-  if (!res.ok) throw new Error("Error updating book");
-  return res.json();
-};
+export const getBookById = (id) => api(`/api/books/${id}`);
 
-export const deleteBook = async (id) => {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
-  if (!res.ok) throw new Error("Error deleting book");
-};
-export const searchBooks = async (query) => {
-  const res = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}`);
-  if (!res.ok) throw new Error("Error searching books");
-  return res.json();
-};
+export const updateBook = (id, book) =>
+  api(`/api/books/${id}`, { method: "PUT", body: book });
+
+export const deleteBook = (id) =>
+  api(`/api/books/${id}`, { method: "DELETE" });

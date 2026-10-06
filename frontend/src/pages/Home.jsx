@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import { getBooks, searchBooks } from "../services/books";
 import GenreShelf from "../components/GenreShelf";
 import BookModal from "../components/BookModal";
+import { useAuth } from "../hooks/useAuth";
 
 const DEFAULT_READING_GOAL = 12;
 
 export default function Home() {
+  const { user, logout } = useAuth();
   const [books, setBooks] = useState([]);
   const [allBooks, setAllBooks] = useState([]);
   const totalBooks = allBooks.length;
@@ -97,14 +99,17 @@ export default function Home() {
   }
 }, [query]);
 
-useEffect(() => {
-  const savedGoal = localStorage.getItem("readingGoal");
-  if (savedGoal) setGoal(Number(savedGoal));
-}, []);
+// La meta de lectura se guarda por usuario en este navegador.
+const goalKey = `readingGoal:${user?.id}`;
 
 useEffect(() => {
-  localStorage.setItem("readingGoal", goal);
-}, [goal]);
+  const savedGoal = localStorage.getItem(goalKey);
+  if (savedGoal) setGoal(Number(savedGoal));
+}, [goalKey]);
+
+useEffect(() => {
+  localStorage.setItem(goalKey, goal);
+}, [goal, goalKey]);
 
 
 const handleSearch = async (e) => {
@@ -140,6 +145,14 @@ const handleSearch = async (e) => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
+      {/* Sesión */}
+      <div className="flex items-center justify-end gap-3 text-sm text-gray-600 mb-4">
+        <span>{user?.email}</span>
+        <button onClick={logout} className="text-purple-600 hover:underline">
+          Cerrar sesión
+        </button>
+      </div>
+
         {/* Header */}
       <div className="flex items-center justify-between mb-6">
        

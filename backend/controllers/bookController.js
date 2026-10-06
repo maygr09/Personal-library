@@ -29,8 +29,9 @@ export async function getBooks(req, res) {
       LEFT JOIN series s ON b.series_id = s.series_id
     `;
 
-    let conditions = [];
-    let values = [];
+    // cada usuario solo ve sus propios libros
+    let conditions = ["b.user_id = $1"];
+    let values = [req.user.id];
 
     // filtro por status
     if (status) {
@@ -106,14 +107,17 @@ export const searchBooks = async (req, res) => {
       JOIN authors a ON b.author_id = a.author_id
       LEFT JOIN series s ON b.series_id = s.series_id
       WHERE
-        b.title ILIKE '%' || $1 || '%'
-        OR b.original_title ILIKE '%' || $1 || '%'
-        OR a.name ILIKE '%' || $1 || '%'
-        OR s.name ILIKE '%' || $1 || '%'
+        b.user_id = $2
+        AND (
+          b.title ILIKE '%' || $1 || '%'
+          OR b.original_title ILIKE '%' || $1 || '%'
+          OR a.name ILIKE '%' || $1 || '%'
+          OR s.name ILIKE '%' || $1 || '%'
+        )
       ORDER BY b.title;
     `;
 
-    const result = await pool.query(searchQuery, [q]);
+    const result = await pool.query(searchQuery, [q, req.user.id]);
 
     // Sí hay resultados
     if (result.rows.length > 0) {
@@ -127,6 +131,7 @@ export const searchBooks = async (req, res) => {
       SELECT
         b.title
       FROM books b
+      WHERE b.user_id = $2
       ORDER BY GREATEST(
         similarity(b.title, $1),
         similarity(b.original_title, $1)
@@ -134,7 +139,7 @@ export const searchBooks = async (req, res) => {
       LIMIT 1;
     `;
 
-    const suggestionResult = await pool.query(suggestionQuery, [q]);
+    const suggestionResult = await pool.query(suggestionQuery, [q, req.user.id]);
 
     return res.json({
       results: [],
@@ -153,9 +158,10 @@ export const searchBooks = async (req, res) => {
 export async function fetchBookById (req, res) {
   try {
     const { id } = req.params;
-    const result = await pool.query('SELECT * FROM books WHERE id = $1', [id]);
-    
-    console.log("Resultado SQL:", result.rows);
+    const result = await pool.query(
+      'SELECT * FROM books WHERE id = $1 AND user_id = $2',
+      [id, req.user.id]
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Book not found" });
@@ -212,11 +218,11 @@ export async function createBook (req, res) {
     series_id = await findOrCreateSeries(series);
   }
   const query = `
-      INSERT INTO books (title, author_id, format, status, series_id, genre) 
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO books (title, author_id, format, status, series_id, genre, user_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
       `;
-      const values = [title, author_id, format, status, series_id, genre ];
+      const values = [title, author_id, format, status, series_id, genre, req.user.id ];
 
       const result = await pool.query(query, values);
       res.status(201).json(result.rows[0]);
@@ -251,8 +257,8 @@ export const updateBook = async (req, res) => {
   try {
     // comprobar existencia del libro
     const existingBookResult = await pool.query(
-      "SELECT * FROM books WHERE id = $1",
-      [id]
+      "SELECT * FROM books WHERE id = $1 AND user_id = $2",
+      [id, req.user.id]
     );
 
     if (existingBookResult.rows.length === 0) {
@@ -291,7 +297,7 @@ export const updateBook = async (req, res) => {
           "INSERT INTO series (name) VALUES ($1) RETURNING series_id",
           [series]
         );
-        series_id = insertSeries.rows[0].id;
+        series_id = insertSeries.rows[0].series_id;
       }
     }
 
@@ -312,7 +318,7 @@ export const updateBook = async (req, res) => {
         format = COALESCE($12, format),
         location = COALESCE($13, location),
         publication_year = COALESCE ($14, publication_year)
-      WHERE id = $15
+      WHERE id = $15 AND user_id = $16
       RETURNING *;
     `;
 
@@ -331,7 +337,8 @@ export const updateBook = async (req, res) => {
   format ?? null,
   location ?? null,
   publication_year ?? null,
-  id
+  id,
+  req.user.id
 ];
 
     const updateResult = await pool.query(updateQuery, values);
@@ -356,7 +363,9 @@ export const deleteBook = async (req, res) => {
   
   try {
     const result = await pool.query(
-      "DELETE FROM books WHERE id = $1", [id]);
+      "DELETE FROM books WHERE id = $1 AND user_id = $2",
+      [id, req.user.id]
+    );
 
     if (result.rowCount === 0)
       return res.status(404).json({ message: "Book not found" });

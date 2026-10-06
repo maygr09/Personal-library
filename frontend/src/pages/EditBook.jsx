@@ -10,11 +10,13 @@ export default function EditBook() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getBookById(id).then((data) => {
-      setBook(data);
-      setLoading(false);
-    });
-  }, [id]);
+    getBookById(id)
+      .then((data) => {
+        setBook(data);
+        setLoading(false);
+      })
+      .catch(() => navigate("/"));
+  }, [id, navigate]);
 
   if (loading) return <p className="text-center mt-10">Loading…</p>;
 
